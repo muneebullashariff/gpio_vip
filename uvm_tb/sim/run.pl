@@ -1,7 +1,7 @@
 #!usr/bin/perl
 
 # Please uncomment what is required.
-system "/bin/csh";
+#system "/bin/csh";
 system "source /pdtools/synosys/source/source.sh";
 #for compilation and simulation in Synopsys VCS
 system " vcs -V -R -full64 -sverilog +v2k -gui -debug_access+all -ntb_opts ../gpio_env/gpio_package.sv ../gpio_top/gpio_top.sv ";
