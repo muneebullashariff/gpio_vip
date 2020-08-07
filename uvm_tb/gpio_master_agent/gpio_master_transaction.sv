@@ -29,19 +29,19 @@
 // Data Members
 //================================================================ 
  
- rand bit [31:0] gpio_in;
- rand bit [31:0] paddir;
- rand bit [31:0] padin;
- rand bit [31:0] padout;
- rand bit [31:0] inten;
- rand bit [31:0] inttype;
- rand bit [31:0] intstatus;
- rand bit [31:0] padcfg;
+	bit	[31:0]	GPn;
+ rand	bit	[31:0]	paddir;
+ 	bit	[31:0]	padin;
+ rand	bit	[31:0]	padout;
+ rand	bit	[31:0]	inten;
+ rand	bit	[31:0]	inttype;
+ rand	bit	[31:0]	intstatus;
+ rand	bit	[31:0]	padcfg;
 
 
 // Registering class and class fileds with uvm factory
  `uvm_object_utils_begin(gpio_master_transaction)
- `uvm_field_int(gpio_in,UVM_ALL_ON)
+ `uvm_field_int(GPn,UVM_ALL_ON)
  `uvm_field_int(paddir,UVM_ALL_ON)
  `uvm_field_int(padin,UVM_ALL_ON)
  `uvm_field_int(padout,UVM_ALL_ON)

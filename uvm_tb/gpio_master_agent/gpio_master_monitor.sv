@@ -25,25 +25,26 @@
 // Registering with UVM Factory
  `uvm_component_utils(gpio_master_monitor)
 
- virtual gpio_if.MMON_MP vif;
+ virtual gpio_if vif;
 
  gpio_master_config mcfg;
 
  gpio_master_transaction mxtn;
 
- uvm_analysis_port #(gpio_master_transaction) analysis_port;
+ uvm_analysis_port #(gpio_master_transaction) mmon_ap;
 
  //=======================methods===================================
  extern function new(string name = "gpio_master_monitor",uvm_component parent);
  extern function void build_phase(uvm_phase phase);
  extern function void connect_phase(uvm_phase phase);
-
+ extern task run_phase (uvm_phase phase);
+ extern task collect_data();
  endclass
 
  //========================constructor=============================
  function gpio_master_monitor::new(string name = "gpio_master_monitor",uvm_component parent);
   super.new(name,parent);
-  analysis_port = new("analysis_port",this);
+  mmon_ap = new("mmon_ap",this);
  endfunction
 
 
@@ -62,7 +63,25 @@ endfunction
   vif = mcfg.vif;
  endfunction
 
+//========================== run_phase ==================
 
+task gpio_master_monitor::run_phase(uvm_phase phase);
+
+begin @(posedge vif.clock)
+collect_data();
+end
+endtask
+
+//=========================Collect data==================
+task gpio_master_monitor::collect_data();
+  gpio_master_transaction mmon_xtn;
+  mmon_xtn=gpio_master_transaction::type_id::create("mmon_xtn");
+
+  mmon_xtn.padin[15:8] = vif.GPn[15:8];
+  mmon_xtn.GPn = mmon_xtn.padin;
+  `uvm_info("MASTER_MONITOR",$sformatf("printing from MASTER MoNiToR \n %s", mmon_xtn.sprint()),UVM_LOW) 
+  mmon_ap.write(mmon_xtn);	//Sent to Scoreboard
+endtask : collect_data
 `endif
 
 //----------------------- End of file -----------------------------------//

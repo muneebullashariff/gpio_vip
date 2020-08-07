@@ -26,7 +26,6 @@
  `uvm_object_utils(gpio_master_sequence)
 
 
-
  //=======================methods===================================
  extern function new(string name = "gpio_master_sequence");
 
@@ -54,9 +53,7 @@
  task master_seqs1::body();
  req = gpio_master_transaction::type_id::create("req");
   start_item(req);
-  assert(req.randomize() with{padin ==32'hFFFF;} ); //RGPIO_OE Resgister
-  `uvm_info("MASTER FIRST SEQS",$sformatf("printing from sequence \n %s", req.sprint()),UVM_HIGH) 
-  req.print();
+  assert(req.randomize() with{paddir[7:0] == 8'b00000000; paddir[15:8] == 8'b11111111;} ); //RGPIO_OE Resgister
   finish_item(req);
 
  endtask

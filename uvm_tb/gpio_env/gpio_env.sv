@@ -109,8 +109,10 @@ gpio_virtual_sequencer v_seqr;
 
   if(env_cfg.has_scoreboard)
    begin
-    magt.mmon.analysis_port.connect(sb.m_fifo.analysis_export);
-    sagt.smon.analysis_port.connect(sb.s_fifo.analysis_export);
+    magt.mdrv.mdrv_ap.connect(sb.m_fifo[0].analysis_export);
+    magt.mmon.mmon_ap.connect(sb.m_fifo[1].analysis_export);
+    sagt.sdrv.sdrv_ap.connect(sb.s_fifo[0].analysis_export);
+    sagt.smon.smon_ap.connect(sb.s_fifo[1].analysis_export);
    end
    
 

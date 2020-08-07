@@ -101,9 +101,42 @@ endfunction
 
 
 
+
+//////////////////////// basic write test ///////////////////////////////
+
+class basic_write_test extends gpio_test;
+
+`uvm_component_utils(basic_write_test)
+
+// Sequence Handles
+master_seqs1	mas_seq1;
+slave_seq1	sla_seq1;
+
+// Methods
+extern function new(string name="basic_write_test",uvm_component parent);
+extern function void build_phase(uvm_phase phase);
+extern task run_phase(uvm_phase phase);
+endclass
+
+function basic_write_test::new(string name="basic_write_test",uvm_component parent);
+super.new(name,parent);
+endfunction
+
+function void basic_write_test::build_phase(uvm_phase phase);
+super.build_phase(phase);
+endfunction
+
+task basic_write_test::run_phase(uvm_phase phase);
+phase.raise_objection(this);
+mas_seq1=master_seqs1::type_id::create("mas_seq1");
+mas_seq1.start(env.magt.mseqr);
+sla_seq1=slave_seq1::type_id::create("sla_seq1");
+sla_seq1.start(env.sagt.sseqr);
+#100;
+phase.drop_objection(this);
+endtask
+
 `endif
-
-
 //----------------------- End of file -----------------------------------//
 ///////////////////////////////////////////////////////////////////////////
 // Modification History:

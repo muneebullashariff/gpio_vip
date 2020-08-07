@@ -35,7 +35,26 @@
   super.new(name);
  endfunction
 
+//**********************SEQUENCES******************************
+  class slave_seq1 extends gpio_slave_sequence;
+  `uvm_object_utils(slave_seq1)
 
+  extern function new(string name ="seq1");
+  extern task body();
+
+ endclass : slave_seq1
+
+ function slave_seq1::new(string name = "seq1");
+  super.new(name);
+ endfunction : new
+
+ task slave_seq1::body();
+ req = gpio_slave_transaction::type_id::create("req");
+  start_item(req);
+  assert(req.randomize() with{paddir[7:0] == 8'b11111111; paddir[15:8] == 8'b00000000;} ); //RGPIO_OE Resgister
+  finish_item(req);
+
+ endtask : body
 
 `endif
 

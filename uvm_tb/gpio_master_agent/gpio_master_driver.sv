@@ -27,23 +27,23 @@ class gpio_master_driver extends uvm_driver #(gpio_master_transaction);
 
  gpio_master_config mcfg;
 
- virtual gpio_if.MDRV_MP vif;
+ virtual gpio_if vif;
 
+ uvm_analysis_port #(gpio_master_transaction) mdrv_ap;
+ 
  //=======================methods===================================
  extern function new(string name = "gpio_master_driver",uvm_component parent);
  extern function void build_phase(uvm_phase phase);
  extern function void connect_phase(uvm_phase phase);
-
- //ADDED CODE
  extern task run_phase(uvm_phase phase);
- extern task data_sent_to_dut(gpio_master_transaction xtn);
+ extern task data_sent_to_dut(gpio_master_transaction mdrv_xtn);
  
- endclass
+ endclass : gpio_master_driver
 
  //========================constructor=============================
   function gpio_master_driver::new(string name="gpio_master_driver",uvm_component parent);
    super.new(name,parent);
-  endfunction
+  endfunction : new
 
  //========================Build_phase=============================
  function void gpio_master_driver::build_phase(uvm_phase phase);
@@ -52,15 +52,17 @@ class gpio_master_driver extends uvm_driver #(gpio_master_transaction);
  if(!uvm_config_db #(gpio_master_config)::get(this,"","gpio_master_config",mcfg)) 
   `uvm_fatal(get_full_name,"CANNOT GET CONFIG FROM MDRV")
 
-endfunction
+  mdrv_ap = new("mdrv_ap",this);
+
+endfunction : build_phase
 
 //========================Connect_phase()===============
  function void gpio_master_driver::connect_phase(uvm_phase phase);
    super.connect_phase(phase);
     vif = mcfg.vif;
- endfunction
+ endfunction : connect_phase
 
-//ADDED
+//========================Run Phase=====================
 task gpio_master_driver::run_phase(uvm_phase phase);
   super.run_phase(phase);
     forever
@@ -69,22 +71,23 @@ task gpio_master_driver::run_phase(uvm_phase phase);
    data_sent_to_dut(req);
    seq_item_port.item_done();
   end
- 
- endtask
+ endtask : run_phase
 
-task gpio_master_driver::data_sent_to_dut(gpio_master_transaction xtn);
-//`uvm_info("MASTER_DRIVER",$sformatf("printing from driver \n %s", xtn.sprint()),UVM_LOW) 
-  begin
+//=======================Data Send task=================
+task gpio_master_driver::data_sent_to_dut(gpio_master_transaction mdrv_xtn);
 
- vif.MDRV.gpio_in <= xtn.gpio_in;
- 
- $display("FROM MASTER DRIVER xtn.gpio_in =%d", xtn.gpio_in);
-  
-`uvm_info("MASTER_DRIVER",$sformatf("printing from driver \n %s", xtn.sprint()),UVM_LOW) 
+  foreach(mdrv_xtn.paddir[i]) begin
+    if(mdrv_xtn.paddir[i]==1'b0) begin
+      vif.GPn[i] = mdrv_xtn.padout[i];
+    end
+    else begin
+      mdrv_xtn.padin[i] = vif.GPn[i];
+    end
   end
-endtask
+  mdrv_ap.write(mdrv_xtn);	//Sent to Scoreboard
+  `uvm_info("MASTER_DRIVER",$sformatf("Printing from MASTER DRIVER \n %s", mdrv_xtn.sprint()),UVM_LOW) 
 
-
+endtask : data_sent_to_dut
 
 
 `endif

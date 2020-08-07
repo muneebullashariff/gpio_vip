@@ -37,10 +37,8 @@ initial
   begin
 
   uvm_config_db #(virtual gpio_if)::set(null,"*","vif",in0);
-  run_test("gpio_test"); 
-
+  run_test("basic_write_test"); 
   end
-
 
 endmodule
 
